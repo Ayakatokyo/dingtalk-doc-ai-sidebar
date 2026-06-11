@@ -4,7 +4,14 @@
   "description": "Use selected DingTalk document text with an OpenAI-compatible AI sidebar.",
   "version": "0.1.0",
   "permissions": ["storage"],
-  "host_permissions": ["https://*.dingtalk.com/*", "https://*.aliwork.com/*", "https://*/*"],
+  "host_permissions": [
+    "https://*.dingtalk.com/*",
+    "https://*.aliwork.com/*",
+    "https://*/*",
+    "http://localhost/*",
+    "http://127.0.0.1/*",
+    "http://[::1]/*"
+  ],
   "background": {
     "service_worker": "background.js",
     "type": "module"

@@ -32,6 +32,10 @@ export async function saveAiSettings(settings: AiSettings): Promise<void> {
   await chrome.storage.local.set({ [STORAGE_KEY]: normalizeSettings(settings) });
 }
 
+function isLoopbackHostname(hostname: string): boolean {
+  return hostname === "localhost" || hostname === "127.0.0.1" || hostname === "[::1]";
+}
+
 export function validateAiSettings(settings: AiSettings): string | null {
   if (!settings.baseUrl.trim()) return "Base URL is required.";
   if (!settings.apiKey.trim()) return "API key is required.";
@@ -44,6 +48,9 @@ export function validateAiSettings(settings: AiSettings): string | null {
   }
   if (url.protocol !== "http:" && url.protocol !== "https:") {
     return "Base URL must use HTTP or HTTPS.";
+  }
+  if (url.protocol === "http:" && !isLoopbackHostname(url.hostname)) {
+    return "HTTP base URLs are only supported for local endpoints.";
   }
   return null;
 }

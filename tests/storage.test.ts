@@ -99,4 +99,30 @@ describe("settings storage", () => {
       })
     ).toBeNull();
   });
+
+  it("rejects non-loopback HTTP URLs", () => {
+    expect(
+      validateAiSettings({
+        baseUrl: "http://api.example.com/v1",
+        apiKey: "key",
+        model: "model"
+      })
+    ).toBe("HTTP base URLs are only supported for local endpoints.");
+  });
+
+  it("accepts loopback HTTP URLs", () => {
+    for (const baseUrl of [
+      "http://localhost:11434/v1",
+      "http://127.0.0.1:11434/v1",
+      "http://[::1]:11434/v1"
+    ]) {
+      expect(
+        validateAiSettings({
+          baseUrl,
+          apiKey: "key",
+          model: "model"
+        })
+      ).toBeNull();
+    }
+  });
 });
