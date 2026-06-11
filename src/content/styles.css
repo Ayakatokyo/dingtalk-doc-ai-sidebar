@@ -1,0 +1,194 @@
+#dingtalk-ai-sidebar-root {
+  position: fixed;
+  z-index: 2147483647;
+  font-family: Arial, "PingFang SC", "Microsoft YaHei", sans-serif;
+  color: #172033;
+}
+
+#dingtalk-ai-sidebar-root,
+#dingtalk-ai-sidebar-root * {
+  box-sizing: border-box;
+}
+
+#dingtalk-ai-sidebar-root .dai-toggle {
+  position: fixed;
+  right: 18px;
+  bottom: 96px;
+  width: 44px;
+  height: 44px;
+  border: 0;
+  border-radius: 8px;
+  background: #2563eb;
+  color: #ffffff;
+  font-size: 14px;
+  font-weight: 700;
+  line-height: 1;
+  cursor: pointer;
+  box-shadow: 0 8px 14px rgba(15, 23, 42, 0.2);
+}
+
+#dingtalk-ai-sidebar-root .dai-panel {
+  position: fixed;
+  top: 72px;
+  right: 18px;
+  width: min(380px, calc(100vw - 36px));
+  max-height: calc(100vh - 96px);
+  display: none;
+  overflow: auto;
+  padding: 14px;
+  border: 1px solid #d6dce7;
+  border-radius: 8px;
+  background: #ffffff;
+  box-shadow: 0 12px 18px rgba(15, 23, 42, 0.18);
+}
+
+#dingtalk-ai-sidebar-root .dai-panel[data-open="true"] {
+  display: block;
+}
+
+#dingtalk-ai-sidebar-root .dai-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 12px;
+}
+
+#dingtalk-ai-sidebar-root .dai-header strong {
+  font-size: 15px;
+  line-height: 1.3;
+}
+
+#dingtalk-ai-sidebar-root button {
+  min-height: 32px;
+  padding: 0 10px;
+  border: 1px solid #cbd5e1;
+  border-radius: 6px;
+  background: #f8fafc;
+  color: #111827;
+  font: inherit;
+  font-size: 13px;
+  cursor: pointer;
+}
+
+#dingtalk-ai-sidebar-root button:hover:not(:disabled) {
+  background: #eef2f7;
+}
+
+#dingtalk-ai-sidebar-root button:focus-visible,
+#dingtalk-ai-sidebar-root textarea:focus-visible,
+#dingtalk-ai-sidebar-root input:focus-visible,
+#dingtalk-ai-sidebar-root summary:focus-visible {
+  outline: 2px solid #2563eb;
+  outline-offset: 2px;
+}
+
+#dingtalk-ai-sidebar-root button:disabled {
+  cursor: not-allowed;
+  opacity: 0.65;
+}
+
+#dingtalk-ai-sidebar-root .dai-close {
+  width: 32px;
+  padding: 0;
+}
+
+#dingtalk-ai-sidebar-root .dai-section {
+  display: grid;
+  gap: 6px;
+  margin-bottom: 12px;
+}
+
+#dingtalk-ai-sidebar-root label,
+#dingtalk-ai-sidebar-root .dai-label,
+#dingtalk-ai-sidebar-root summary {
+  color: #172033;
+  font-size: 12px;
+  font-weight: 700;
+  line-height: 1.4;
+}
+
+#dingtalk-ai-sidebar-root textarea,
+#dingtalk-ai-sidebar-root input {
+  width: 100%;
+  border: 1px solid #cbd5e1;
+  border-radius: 6px;
+  background: #ffffff;
+  color: #111827;
+  padding: 8px;
+  font: inherit;
+  font-size: 13px;
+  line-height: 1.45;
+}
+
+#dingtalk-ai-sidebar-root textarea::placeholder,
+#dingtalk-ai-sidebar-root input::placeholder {
+  color: #64748b;
+}
+
+#dingtalk-ai-sidebar-root textarea {
+  min-height: 76px;
+  resize: vertical;
+}
+
+#dingtalk-ai-sidebar-root .dai-output {
+  min-height: 128px;
+}
+
+#dingtalk-ai-sidebar-root .dai-actions,
+#dingtalk-ai-sidebar-root .dai-settings-buttons {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+#dingtalk-ai-sidebar-root .dai-action {
+  flex: 0 1 auto;
+}
+
+#dingtalk-ai-sidebar-root .dai-generate {
+  background: #2563eb;
+  border-color: #2563eb;
+  color: #ffffff;
+  font-weight: 700;
+}
+
+#dingtalk-ai-sidebar-root .dai-generate:hover:not(:disabled) {
+  background: #1d4ed8;
+}
+
+#dingtalk-ai-sidebar-root .dai-settings {
+  display: grid;
+  gap: 8px;
+  margin-bottom: 12px;
+}
+
+#dingtalk-ai-sidebar-root .dai-settings summary {
+  cursor: pointer;
+}
+
+#dingtalk-ai-sidebar-root .dai-status {
+  min-height: 18px;
+  color: #475569;
+  font-size: 12px;
+  line-height: 1.5;
+}
+
+#dingtalk-ai-sidebar-root .dai-status[data-kind="error"] {
+  color: #b91c1c;
+  font-weight: 700;
+}
+
+#dingtalk-ai-sidebar-root[data-loading="true"] .dai-status {
+  color: #1d4ed8;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  #dingtalk-ai-sidebar-root .dai-toggle,
+  #dingtalk-ai-sidebar-root button {
+    transition:
+      background-color 150ms ease,
+      opacity 150ms ease,
+      box-shadow 150ms ease;
+  }
+}
