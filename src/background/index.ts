@@ -3,7 +3,9 @@ import { getAiSettings, validateAiSettings } from "../shared/storage";
 import type { RuntimeRequest, RuntimeResponse } from "../shared/types";
 import { callOpenAiCompatibleApi } from "./aiClient";
 
-async function handleRequest(request: RuntimeRequest): Promise<RuntimeResponse> {
+let isRuntimeListenerRegistered = false;
+
+export async function handleRequest(request: RuntimeRequest): Promise<RuntimeResponse> {
   try {
     const settings = await getAiSettings();
     const settingsError = validateAiSettings(settings);
@@ -28,7 +30,15 @@ async function handleRequest(request: RuntimeRequest): Promise<RuntimeResponse> 
   }
 }
 
-chrome.runtime.onMessage.addListener((request: RuntimeRequest, _sender, sendResponse) => {
-  handleRequest(request).then(sendResponse);
-  return true;
-});
+export function registerRuntimeListener(): void {
+  if (isRuntimeListenerRegistered) return;
+
+  chrome.runtime.onMessage.addListener((request: RuntimeRequest, _sender, sendResponse) => {
+    handleRequest(request).then(sendResponse);
+    return true;
+  });
+
+  isRuntimeListenerRegistered = true;
+}
+
+registerRuntimeListener();

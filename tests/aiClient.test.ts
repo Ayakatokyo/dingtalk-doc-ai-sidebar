@@ -69,4 +69,43 @@ describe("AI client", () => {
       "AI API returned an empty response."
     );
   });
+
+  it("throws when response choices are missing", async () => {
+    vi.mocked(fetch).mockResolvedValue(
+      new Response(JSON.stringify({}), {
+        status: 200,
+        headers: { "Content-Type": "application/json" }
+      })
+    );
+
+    await expect(callOpenAiCompatibleApi(settings, messages)).rejects.toThrow(
+      "AI API returned an invalid response."
+    );
+  });
+
+  it("throws when response choices are not an array", async () => {
+    vi.mocked(fetch).mockResolvedValue(
+      new Response(JSON.stringify({ choices: {} }), {
+        status: 200,
+        headers: { "Content-Type": "application/json" }
+      })
+    );
+
+    await expect(callOpenAiCompatibleApi(settings, messages)).rejects.toThrow(
+      "AI API returned an invalid response."
+    );
+  });
+
+  it("throws when response content is not a string", async () => {
+    vi.mocked(fetch).mockResolvedValue(
+      new Response(JSON.stringify({ choices: [{ message: { content: 42 } }] }), {
+        status: 200,
+        headers: { "Content-Type": "application/json" }
+      })
+    );
+
+    await expect(callOpenAiCompatibleApi(settings, messages)).rejects.toThrow(
+      "AI API returned an invalid response."
+    );
+  });
 });
