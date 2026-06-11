@@ -1,0 +1,22 @@
+{
+  "manifest_version": 3,
+  "name": "DingTalk Doc AI Sidebar",
+  "description": "Use selected DingTalk document text with an OpenAI-compatible AI sidebar.",
+  "version": "0.1.0",
+  "permissions": ["storage"],
+  "host_permissions": ["https://*.dingtalk.com/*", "https://*.aliwork.com/*", "https://*/*"],
+  "background": {
+    "service_worker": "background.js",
+    "type": "module"
+  },
+  "content_scripts": [
+    {
+      "matches": ["https://*.dingtalk.com/*", "https://*.aliwork.com/*"],
+      "js": ["content.js"],
+      "run_at": "document_idle"
+    }
+  ],
+  "action": {
+    "default_title": "DingTalk Doc AI Sidebar"
+  }
+}
