@@ -38,6 +38,28 @@ describe("settings storage", () => {
     });
   });
 
+  it("returns empty settings when stored settings are null", async () => {
+    await chrome.storage.local.set({ aiSettings: null });
+
+    await expect(getAiSettings()).resolves.toEqual({
+      baseUrl: "",
+      apiKey: "",
+      model: ""
+    });
+  });
+
+  it("coerces partial malformed stored settings", async () => {
+    await chrome.storage.local.set({
+      aiSettings: { baseUrl: 42, apiKey: " key ", model: null }
+    });
+
+    await expect(getAiSettings()).resolves.toEqual({
+      baseUrl: "",
+      apiKey: "key",
+      model: ""
+    });
+  });
+
   it("validates missing values", () => {
     expect(
       validateAiSettings({
@@ -46,5 +68,35 @@ describe("settings storage", () => {
         model: "model"
       })
     ).toBe("Base URL is required.");
+  });
+
+  it("validates invalid URL values", () => {
+    expect(
+      validateAiSettings({
+        baseUrl: "not a url",
+        apiKey: "key",
+        model: "model"
+      })
+    ).toBe("Base URL must be a valid URL.");
+  });
+
+  it("validates unsupported URL schemes", () => {
+    expect(
+      validateAiSettings({
+        baseUrl: "ftp://example.com/v1",
+        apiKey: "key",
+        model: "model"
+      })
+    ).toBe("Base URL must use HTTP or HTTPS.");
+  });
+
+  it("accepts localhost HTTP URLs", () => {
+    expect(
+      validateAiSettings({
+        baseUrl: "http://localhost:11434/v1",
+        apiKey: "key",
+        model: "model"
+      })
+    ).toBeNull();
   });
 });

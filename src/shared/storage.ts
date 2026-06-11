@@ -8,11 +8,18 @@ const EMPTY_SETTINGS: AiSettings = {
   model: ""
 };
 
-function normalizeSettings(settings: AiSettings): AiSettings {
+function coerceString(value: unknown): string {
+  return typeof value === "string" ? value : "";
+}
+
+function normalizeSettings(settings: unknown): AiSettings {
+  const record =
+    settings && typeof settings === "object" ? (settings as Record<string, unknown>) : {};
+
   return {
-    baseUrl: settings.baseUrl.trim().replace(/\/+$/, ""),
-    apiKey: settings.apiKey.trim(),
-    model: settings.model.trim()
+    baseUrl: coerceString(record.baseUrl).trim().replace(/\/+$/, ""),
+    apiKey: coerceString(record.apiKey).trim(),
+    model: coerceString(record.model).trim()
   };
 }
 
@@ -29,10 +36,14 @@ export function validateAiSettings(settings: AiSettings): string | null {
   if (!settings.baseUrl.trim()) return "Base URL is required.";
   if (!settings.apiKey.trim()) return "API key is required.";
   if (!settings.model.trim()) return "Model is required.";
+  let url: URL;
   try {
-    new URL(settings.baseUrl);
+    url = new URL(settings.baseUrl);
   } catch {
     return "Base URL must be a valid URL.";
+  }
+  if (url.protocol !== "http:" && url.protocol !== "https:") {
+    return "Base URL must use HTTP or HTTPS.";
   }
   return null;
 }
