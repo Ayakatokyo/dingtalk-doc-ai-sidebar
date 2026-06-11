@@ -6,6 +6,7 @@ export default defineConfig({
     globals: true,
     setupFiles: ["tests/setup.ts"],
     clearMocks: true,
-    restoreMocks: true
+    restoreMocks: true,
+    passWithNoTests: true
   }
 });

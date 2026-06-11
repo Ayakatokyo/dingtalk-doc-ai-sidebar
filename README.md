@@ -11,7 +11,11 @@ npm run typecheck
 npm run build
 ```
 
+`npm run build` requires the extension source entry files, which are implemented after the initial tooling scaffold.
+
 ## Load in Chrome or Edge
+
+After the extension source files are implemented:
 
 1. Run `npm run build`.
 2. Open `chrome://extensions` or `edge://extensions`.
