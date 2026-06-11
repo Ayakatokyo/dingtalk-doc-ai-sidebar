@@ -122,12 +122,13 @@ export function setStatus(
   elements.status.dataset.kind = kind;
 }
 
-export function setLoading(elements: SidebarElements, loading: boolean): void {
+export function setLoading(elements: SidebarElements, loading: boolean, label = "Generating..."): void {
   elements.root.dataset.loading = String(loading);
   elements.generateButton.disabled = loading;
   elements.testConnectionButton.disabled = loading;
   elements.saveSettingsButton.disabled = loading;
-  elements.generateButton.textContent = loading ? "Generating..." : "Generate";
+  elements.generateButton.textContent = loading && label !== "Testing..." ? label : "Generate";
+  elements.testConnectionButton.textContent = loading && label === "Testing..." ? label : "Test";
 }
 
 export function applyRuntimeResponse(elements: SidebarElements, response: RuntimeResponse): void {

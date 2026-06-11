@@ -11,12 +11,26 @@ import {
   setSidebarOpen,
   setStatus
 } from "./sidebar";
+import type { SidebarElements } from "./sidebar";
 
-async function sendRuntimeMessage(request: RuntimeRequest): Promise<RuntimeResponse> {
+export async function sendRuntimeMessage(request: RuntimeRequest): Promise<RuntimeResponse> {
   return new Promise((resolve) => {
-    chrome.runtime.sendMessage(request, (response: RuntimeResponse | undefined) => {
-      resolve(response || { ok: false, error: "No response from extension background worker." });
-    });
+    try {
+      chrome.runtime.sendMessage(request, (response: RuntimeResponse | undefined) => {
+        const lastErrorMessage = chrome.runtime.lastError?.message;
+        if (lastErrorMessage) {
+          resolve({ ok: false, error: lastErrorMessage });
+          return;
+        }
+
+        resolve(response || { ok: false, error: "No response from extension background worker." });
+      });
+    } catch (error) {
+      resolve({
+        ok: false,
+        error: error instanceof Error ? error.message : "Unable to send message to extension."
+      });
+    }
   });
 }
 
@@ -29,7 +43,7 @@ function injectStyles(): void {
   document.documentElement.append(style);
 }
 
-function readSettingsFromInputs(sidebar: ReturnType<typeof createSidebar>): AiSettings {
+function readSettingsFromInputs(sidebar: SidebarElements): AiSettings {
   return {
     baseUrl: sidebar.baseUrl.value,
     apiKey: sidebar.apiKey.value,
@@ -37,13 +51,13 @@ function readSettingsFromInputs(sidebar: ReturnType<typeof createSidebar>): AiSe
   };
 }
 
-function refreshSelectedText(sidebar: ReturnType<typeof createSidebar>): string {
+function refreshSelectedText(sidebar: SidebarElements): string {
   const selectedText = readSelectedText();
   if (selectedText) sidebar.selectedText.value = selectedText;
   return sidebar.selectedText.value;
 }
 
-async function saveValidatedSettings(sidebar: ReturnType<typeof createSidebar>): Promise<boolean> {
+async function saveValidatedSettings(sidebar: SidebarElements): Promise<boolean> {
   const settings = readSettingsFromInputs(sidebar);
   const error = validateAiSettings(settings);
   if (error) {
@@ -53,6 +67,30 @@ async function saveValidatedSettings(sidebar: ReturnType<typeof createSidebar>):
 
   await saveAiSettings(settings);
   return true;
+}
+
+export async function handleSaveSettings(sidebar: SidebarElements): Promise<void> {
+  try {
+    if (!(await saveValidatedSettings(sidebar))) return;
+    setStatus(sidebar, "Settings saved.");
+  } catch (error) {
+    setStatus(sidebar, error instanceof Error ? error.message : "Unable to save settings.", "error");
+  }
+}
+
+export async function handleTestConnection(sidebar: SidebarElements): Promise<void> {
+  setLoading(sidebar, true, "Testing...");
+  try {
+    if (!(await saveValidatedSettings(sidebar))) return;
+
+    setStatus(sidebar, "Testing connection...");
+    const response = await sendRuntimeMessage({ type: "TEST_CONNECTION" });
+    applyRuntimeResponse(sidebar, response.ok ? { ok: true, text: "Connection works." } : response);
+  } catch (error) {
+    setStatus(sidebar, error instanceof Error ? error.message : "Unable to test connection.", "error");
+  } finally {
+    setLoading(sidebar, false);
+  }
 }
 
 async function main(): Promise<void> {
@@ -96,7 +134,7 @@ async function main(): Promise<void> {
       return;
     }
 
-    setLoading(sidebar, true);
+    setLoading(sidebar, true, "Generating...");
     setStatus(sidebar, "Generating...");
     try {
       const response = await sendRuntimeMessage({
@@ -131,29 +169,9 @@ async function main(): Promise<void> {
     }
   });
 
-  sidebar.saveSettingsButton.addEventListener("click", async () => {
-    if (!(await saveValidatedSettings(sidebar))) return;
-    setStatus(sidebar, "Settings saved.");
-  });
+  sidebar.saveSettingsButton.addEventListener("click", () => void handleSaveSettings(sidebar));
 
-  sidebar.testConnectionButton.addEventListener("click", async () => {
-    if (!(await saveValidatedSettings(sidebar))) return;
-
-    setLoading(sidebar, true);
-    setStatus(sidebar, "Testing connection...");
-    try {
-      const response = await sendRuntimeMessage({ type: "TEST_CONNECTION" });
-      applyRuntimeResponse(sidebar, response.ok ? { ok: true, text: "Connection works." } : response);
-    } catch (error) {
-      setStatus(
-        sidebar,
-        error instanceof Error ? error.message : "Unable to test connection.",
-        "error"
-      );
-    } finally {
-      setLoading(sidebar, false);
-    }
-  });
+  sidebar.testConnectionButton.addEventListener("click", () => void handleTestConnection(sidebar));
 
   setSidebarOpen(sidebar, false);
 }
